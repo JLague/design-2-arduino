@@ -1,11 +1,11 @@
 // Constants
 const int DELAY_20HZ = 500; // microseconds
 const int DELAY_1HZ = 10; // milliseconds
-const int TIME_DIFF = DELAY_1HZ*1000/DELAY_20HZ;
+const int DELAY_RATIO = (DELAY_1HZ*1000) / DELAY_20HZ;
 const int NUM_SAMPLES = 100; // samples
 
 // Variable
-int sinTable[NUM_SAMPLES];
+int sineTable[NUM_SAMPLES];
 int fastCount = 0;
 
 void setup() {
@@ -13,19 +13,23 @@ void setup() {
   DDRB = 0xFF;
   DDRL = 0xFF;
 
-  // Sin pattern
+  // Sine pattern
   for(int i=0;i<NUM_SAMPLES;i++) {
-    sinTable[i]= 46+46*sin(2*PI*i/NUM_SAMPLES);
+    sineTable[i]= 128+127*sin(2*PI*i/NUM_SAMPLES);
   }
 }
 
 void loop() {
-  for (int value : sinTable) {
-    for (int i = 0; i < TIME_DIFF; ++i) {
-      PORTB = sinTable[fastCount++];
+  for (int i = 0; i < NUM_SAMPLES; ++i) {
+    // Iterate over values for slow sine
+    
+    for (int j = 0; j < DELAY_RATIO; ++j) {
+      // Iterate over values for fast sine
+      
+      PORTB = sineTable[fastCount++];
       fastCount %= NUM_SAMPLES;
       delayMicroseconds(DELAY_20HZ);
     }
-    PORTL = value;
+    PORTL = sineTable[i];
   }
 }
