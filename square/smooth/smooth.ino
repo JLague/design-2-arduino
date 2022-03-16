@@ -5,6 +5,11 @@ const int DURATION = 1000; // us
 const int X_POINTS[NUM_POINTS] = {0, 1023, 1023, 0};
 const int Y_POINTS[NUM_POINTS] = {0, 0, 1023, 1023};
 
+// Pin constants
+const int xPin = 9;
+const int yPin = 10;
+const int laserPin = 7;
+
 int BM_COORDS[][2] = {
     {1,6},
     {2,8},
@@ -44,11 +49,6 @@ int BM_COORDS[][2] = {
     {-2,8},
     {-1,6}
 };
-
-// Pin constants
-const int xPin = 11;
-const int yPin = 12;
-const int laserPin = 7;
 
 // Variables
 int xPos = 0;
