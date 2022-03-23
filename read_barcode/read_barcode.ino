@@ -8,14 +8,25 @@
 */
 
 // Points
-const int NUM_POINTS = 2;
-const int X_POINTS[NUM_POINTS] = {0, 255};
-const int Y_POINTS[NUM_POINTS] = {0, 0};
+//const int NUM_POINTS = 2;
+//const int X_POINTS[NUM_POINTS] = {0, 255};
+//const int Y_POINTS[NUM_POINTS] = {80, 80};
 
-// Star pattern
-//const unsigned NUM_POINTS = 51;
+// 51 points star pattern
+//const unsigned int NUM_POINTS = 51;
 //const uint8_t X_POINTS[NUM_POINTS] = {254, 0, 253, 2, 250, 6, 245, 12, 238, 20, 230, 29, 220, 40, 208, 52, 195, 66, 181, 80, 166, 95, 151, 111, 135, 127, 119, 143, 103, 159, 88, 174, 73, 188, 59, 202, 46, 214, 34, 225, 24, 234, 16, 242, 9, 248, 4, 252, 1, 254, 0};
 //const uint8_t Y_POINTS[NUM_POINTS] = {127, 135, 111, 151, 95, 166, 80, 181, 66, 195, 52, 208, 40, 220, 29, 230, 20, 238, 12, 245, 6, 250, 2, 253, 0, 254, 0, 253, 2, 250, 6, 245, 12, 238, 20, 230, 29, 220, 40, 208, 52, 195, 66, 181, 80, 166, 95, 151, 111, 135, 127};
+
+// 21 points star pattern
+//const unsigned int NUM_POINTS = 26;
+//const uint8_t X_POINTS[NUM_POINTS] = {127, 1, 127, 9, 127, 24, 127, 46, 127, 73, 127, 103, 127, 127, 103, 127, 73, 127, 46, 127, 24, 127, 9, 127, 1, 127};
+//const uint8_t Y_POINTS[NUM_POINTS] = {127, 127, 95, 127, 66, 127, 40, 127, 20, 127, 6, 127, 0, 127, 2, 127, 12, 127, 29, 127, 52, 127, 80, 127, 111, 127};
+
+// + pattern
+const unsigned int NUM_POINTS = 6;
+const int X_POINTS[NUM_POINTS] = {0, 255, 0, 127, 127, 127};
+const int Y_POINTS[NUM_POINTS] = {127, 127, 127, 255, 0, 255};
+
 
 // Flags
 const uint8_t SCAN_END = B10;
@@ -28,10 +39,11 @@ const uint8_t LASER_PIN = 7;
 const uint8_t DIODE_PIN = 13;
 
 // General constants
-const unsigned long BAUDRATE = 9600;
-const unsigned int NUM_SAMPLES = 1000;
-const unsigned int SAMPLE_TIME = 1000; // us
-const uint8_t NUM_TESTS = 2;
+const unsigned long BAUDRATE = 1000000;
+const unsigned int NUM_SAMPLES = 2000;
+//const unsigned int NUM_SAMPLES = 100;
+const unsigned int SAMPLE_TIME = 0; // us
+const uint8_t NUM_TESTS = 1;
 
 // Variables
 uint8_t pos_x = 0;
@@ -62,18 +74,25 @@ void setup() {
 
 void loop() {
   // Do n swipes (for tests)
-  for(int i = 0; i < NUM_TESTS; ++i) {
-    goto_pos(X_POINTS[0], 0, NUM_SAMPLES, SAMPLE_TIME);
-    goto_pos(X_POINTS[1], 0, NUM_SAMPLES, SAMPLE_TIME);
-  }
+//  for(int i = 0; i < NUM_TESTS; ++i) {
+//    goto_pos(X_POINTS[0], Y_POINTS[0], NUM_SAMPLES, SAMPLE_TIME);
+//    goto_pos(X_POINTS[1], Y_POINTS[1], NUM_SAMPLES, SAMPLE_TIME);
+//  }
 
   /* Uncomment for 2D scan */
-//  for(int i = 0; i < NUM_POINTS; ++i) {
-//    goto_pos(X_POINTS[i], Y_POINTS[i], NUM_SAMPLES, SAMPLE_TIME);
-//  }
+  for(int i = 0; i < NUM_POINTS; ++i) {
+    goto_pos(X_POINTS[i], Y_POINTS[i], NUM_SAMPLES, SAMPLE_TIME);
+  }
   
   write_flags(SCAN_END);
   Serial.flush();
+  if (Serial.available()) {
+    Serial.read();
+    Serial.flush();
+    digitalWrite(LASER_PIN, LOW);
+    delay(2000);
+    digitalWrite(LASER_PIN, HIGH);
+  }
 }
 
 /**
@@ -98,7 +117,7 @@ void goto_pos(const unsigned int &new_x, const unsigned int &new_y, const unsign
     set_pos((unsigned int)tmp_x, (unsigned int)tmp_y);
     rw_diode();
     
-    delayMicroseconds(sample_time);
+//    delayMicroseconds(sample_time);
   }
 
   set_pos(new_x, new_y);
