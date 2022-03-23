@@ -30,8 +30,7 @@ const int Y_POINTS[NUM_POINTS] = {127, 127, 127, 255, 0, 255};
 
 // Flags
 const uint8_t SCAN_END = B10;
-const uint8_t PATTERN_END = B100;
-const uint8_t CLEARED_BUFFER = B1000;
+const uint8_t CLEARED_BUFFER = B100;
 
 // Pin constants
 const uint8_t X_PIN = 11;
