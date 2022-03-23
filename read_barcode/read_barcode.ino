@@ -1,7 +1,7 @@
 /**
   Prototype - Équipe 12 - PIE Engineering
-  Name: smooth
-  Purpose: Smoothly move galvanometers and sample barcode with photodiode
+  Name: read_barcode
+  Purpose: Move galvanometers between points while sampling photodiode
 
   @author Justin Lagüe
   @version 0.1
@@ -30,7 +30,8 @@ const int Y_POINTS[NUM_POINTS] = {127, 127, 127, 255, 0, 255};
 
 // Flags
 const uint8_t SCAN_END = B10;
-const uint8_t PATTERN_END = B11;
+const uint8_t PATTERN_END = B100;
+const uint8_t CLEARED_BUFFER = B1000;
 
 // Pin constants
 const uint8_t X_PIN = 11;
@@ -41,8 +42,6 @@ const uint8_t DIODE_PIN = 13;
 // General constants
 const unsigned long BAUDRATE = 1000000;
 const unsigned int NUM_SAMPLES = 2000;
-//const unsigned int NUM_SAMPLES = 100;
-const unsigned int SAMPLE_TIME = 0; // us
 const uint8_t NUM_TESTS = 1;
 
 // Variables
@@ -79,16 +78,18 @@ void loop() {
 //    goto_pos(X_POINTS[1], Y_POINTS[1], NUM_SAMPLES, SAMPLE_TIME);
 //  }
 
-  /* Uncomment for 2D scan */
   for(int i = 0; i < NUM_POINTS; ++i) {
-    goto_pos(X_POINTS[i], Y_POINTS[i], NUM_SAMPLES, SAMPLE_TIME);
+    goto_pos(X_POINTS[i], Y_POINTS[i], NUM_SAMPLES);
   }
   
   write_flags(SCAN_END);
   Serial.flush();
+  
   if (Serial.available()) {
     Serial.read();
+    write_flags(CLEARED_BUFFER);
     Serial.flush();
+    
     digitalWrite(LASER_PIN, LOW);
     delay(2000);
     digitalWrite(LASER_PIN, HIGH);
@@ -103,7 +104,7 @@ void loop() {
   @param num_samples Number of samples/steps between old and new position.
   @param sample_time Time in ms between samples/steps.
  */
-void goto_pos(const unsigned int &new_x, const unsigned int &new_y, const unsigned int &num_samples, const unsigned int &sample_time) {
+void goto_pos(const unsigned int &new_x, const unsigned int &new_y, const unsigned int &num_samples) {
   const float incr_x = ((float)new_x - pos_x) / num_samples;
   const float incr_y = ((float)new_y - pos_y) / num_samples;
 
@@ -116,8 +117,6 @@ void goto_pos(const unsigned int &new_x, const unsigned int &new_y, const unsign
    
     set_pos((unsigned int)tmp_x, (unsigned int)tmp_y);
     rw_diode();
-    
-//    delayMicroseconds(sample_time);
   }
 
   set_pos(new_x, new_y);
